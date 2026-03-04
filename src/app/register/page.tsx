@@ -8,12 +8,20 @@ import {
   RegisterFormValues,
   registerSchema,
 } from "@/constants/registerConstants";
+import { signUp } from "aws-amplify/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+
+type AuthError = {
+  name?: string;
+  message?: string;
+};
 
 export default function RegisterPage() {
   const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const {
     register,
@@ -26,8 +34,10 @@ export default function RegisterPage() {
   });
 
   const onSubmit = async (formValues: RegisterFormValues) => {
-    console.log(formValues);
-    router.push("/verify-email");
+    setErrorMessage(null);
+
+   console.log(formValues);
+   
   };
 
   return (
@@ -46,6 +56,12 @@ export default function RegisterPage() {
             <p className="mt-2 text-sm text-slate-300 sm:text-base">
               Fill in the required Cognito attributes to sign up.
             </p>
+
+            {errorMessage ? (
+              <p className="mt-4 rounded-xl border border-rose-400/30 bg-rose-400/10 px-4 py-2 text-sm text-rose-200">
+                {errorMessage}
+              </p>
+            ) : null}
           </div>
 
           <form

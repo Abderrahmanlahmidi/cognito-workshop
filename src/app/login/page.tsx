@@ -8,10 +8,21 @@ import {
   LoginFormValues,
   loginSchema,
 } from "@/constants/loginConstants";
+import { signIn } from "aws-amplify/auth";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
+type AuthError = {
+  name?: string;
+  message?: string;
+};
+
 export default function LoginPage() {
+  const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -23,6 +34,8 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (formValues: LoginFormValues) => {
+    setErrorMessage(null);
+
     console.log(formValues);
   };
 
@@ -42,6 +55,12 @@ export default function LoginPage() {
             <p className="mt-2 text-sm text-slate-300 sm:text-base">
               Use your email or username with your password.
             </p>
+
+            {errorMessage ? (
+              <p className="mt-4 rounded-xl border border-rose-400/30 bg-rose-400/10 px-4 py-2 text-sm text-rose-200">
+                {errorMessage}
+              </p>
+            ) : null}
           </div>
 
           <form
