@@ -9,31 +9,21 @@ import {
   verifyEmailSchema,
 } from "@/constants/verifyEmailConstants";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-function VerifyEmailForm() {
+export default function VerifyEmailPage() {
   const [isVerified, setIsVerified] = useState(false);
-  const searchParams = useSearchParams();
 
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors, isSubmitting },
   } = useForm<VerifyEmailFormValues>({
     resolver: zodResolver(verifyEmailSchema),
     mode: "onTouched",
     defaultValues: verifyEmailDefaultValues,
   });
-
-  useEffect(() => {
-    const emailFromQuery = searchParams.get("email");
-    if (emailFromQuery) {
-      setValue("email", emailFromQuery);
-    }
-  }, [searchParams, setValue]);
 
   const onSubmit = async (formValues: VerifyEmailFormValues) => {
     console.log(formValues);
@@ -63,22 +53,6 @@ function VerifyEmailForm() {
             noValidate
             className="space-y-5"
           >
-            <label className="block">
-              <span className="text-sm font-medium text-slate-200">Email</span>
-              <input
-                type="email"
-                autoComplete="email"
-                className={`${verifyEmailInputClassName} ${errors.email ? verifyEmailInputErrorClassName : ""}`}
-                placeholder="you@example.com"
-                {...register("email")}
-              />
-              {errors.email ? (
-                <p className="mt-2 text-xs text-rose-300">
-                  {errors.email.message}
-                </p>
-              ) : null}
-            </label>
-
             <label className="block">
               <span className="text-sm font-medium text-slate-200">
                 Verification Code
@@ -132,21 +106,5 @@ function VerifyEmailForm() {
         </div>
       </section>
     </main>
-  );
-}
-
-export default function VerifyEmailPage() {
-  return (
-    <Suspense
-      fallback={
-        <main className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100">
-          <section className="mx-auto flex min-h-screen w-full max-w-4xl items-center justify-center px-6 py-16 sm:px-10">
-            <p className="text-sm text-slate-300">Loading verification form...</p>
-          </section>
-        </main>
-      }
-    >
-      <VerifyEmailForm />
-    </Suspense>
   );
 }

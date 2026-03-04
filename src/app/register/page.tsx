@@ -27,7 +27,7 @@ export default function RegisterPage() {
 
   const onSubmit = async (formValues: RegisterFormValues) => {
     console.log(formValues);
-    router.push(`/verify-email?email=${encodeURIComponent(formValues.email)}`);
+    router.push("/verify-email");
   };
 
   return (

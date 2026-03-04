@@ -7,7 +7,6 @@ export const verifyEmailInputErrorClassName =
   "border-rose-400 focus:border-rose-400 focus:ring-rose-400/20";
 
 export const verifyEmailSchema = z.object({
-  email: z.string().trim().email("Enter a valid email address"),
   code: z
     .string()
     .trim()
@@ -17,6 +16,5 @@ export const verifyEmailSchema = z.object({
 export type VerifyEmailFormValues = z.infer<typeof verifyEmailSchema>;
 
 export const verifyEmailDefaultValues: VerifyEmailFormValues = {
-  email: "",
   code: "",
 };
