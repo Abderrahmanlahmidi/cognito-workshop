@@ -8,12 +8,22 @@ import {
   VerifyEmailFormValues,
   verifyEmailSchema,
 } from "@/constants/verifyEmailConstants";
+import { confirmSignUp } from "aws-amplify/auth";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 
-export default function VerifyEmailPage() {
+type AuthError = {
+  message?: string;
+};
+
+function VerifyEmailPageContent() {
   const [isVerified, setIsVerified] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const identifier = searchParams.get("identifier");
 
   const {
     register,
@@ -26,8 +36,30 @@ export default function VerifyEmailPage() {
   });
 
   const onSubmit = async (formValues: VerifyEmailFormValues) => {
-    console.log(formValues);
-    setIsVerified(true);
+    setErrorMessage(null);
+
+    if (!identifier) {
+      setErrorMessage("Identifier is missing. Please go back and try again.");
+      return;
+    }
+
+    try {
+      const { isSignUpComplete } = await confirmSignUp({
+        username: identifier,
+        confirmationCode: formValues.code,
+      });
+
+      if (isSignUpComplete) {
+        setIsVerified(true);
+        setTimeout(() => {
+          router.push("/login");
+        }, 3000);
+      }
+    } catch (error: unknown) {
+      const authError = error as AuthError;
+      console.error("Error confirming sign up:", authError);
+      setErrorMessage(authError.message || "Invalid verification code.");
+    }
   };
 
   return (
@@ -46,6 +78,12 @@ export default function VerifyEmailPage() {
             <p className="mt-2 text-sm text-slate-300 sm:text-base">
               Enter the verification code sent to your email.
             </p>
+
+            {errorMessage ? (
+              <p className="mt-4 rounded-xl border border-rose-400/30 bg-rose-400/10 px-4 py-2 text-sm text-rose-200">
+                {errorMessage}
+              </p>
+            ) : null}
           </div>
 
           <form
@@ -83,7 +121,7 @@ export default function VerifyEmailPage() {
 
           {isVerified ? (
             <p className="mt-4 rounded-xl border border-emerald-300/30 bg-emerald-300/10 px-4 py-3 text-sm text-emerald-200">
-              Email verification completed. You can sign in now.
+              Email verification completed. Redirecting to login...
             </p>
           ) : null}
 
@@ -106,5 +144,21 @@ export default function VerifyEmailPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100">
+          <section className="mx-auto flex min-h-screen w-full max-w-4xl items-center justify-center px-6 py-16 sm:px-10">
+            <p className="text-sm text-slate-300">Loading verification form...</p>
+          </section>
+        </main>
+      }
+    >
+      <VerifyEmailPageContent />
+    </Suspense>
   );
 }
