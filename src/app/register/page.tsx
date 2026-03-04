@@ -1,33 +1,26 @@
 "use client";
 
-import { useForm } from "@/hooks/useForm";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  registerDefaultValues,
+  registerInputClassName,
+  registerInputErrorClassName,
+  RegisterFormValues,
+  registerSchema,
+} from "@/constants/registerConstants";
 import Link from "next/link";
-
-const inputClassName =
-  "mt-2 w-full rounded-xl border border-slate-700/70 bg-slate-900/70 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-400 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20";
-
-type RegisterFormValues = {
-  email: string;
-  username: string;
-  given_name: string;
-  family_name: string;
-  birthdate: string;
-  address: string;
-  password: string;
-};
+import { useForm } from "react-hook-form";
 
 export default function RegisterPage() {
-  
-  const { values, handleChange, handleSubmit, isSubmitting } =
-    useForm<RegisterFormValues>({
-      email: "",
-      username: "",
-      given_name: "",
-      family_name: "",
-      birthdate: "",
-      address: "",
-      password: "",
-    });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+    mode: "onTouched",
+    defaultValues: registerDefaultValues,
+  });
 
   const onSubmit = async (formValues: RegisterFormValues) => {
     console.log(formValues);
@@ -53,20 +46,23 @@ export default function RegisterPage() {
 
           <form
             onSubmit={handleSubmit(onSubmit)}
+            noValidate
             className="grid grid-cols-1 gap-5 sm:grid-cols-2"
           >
             <label className="block">
               <span className="text-sm font-medium text-slate-200">Email</span>
               <input
                 type="email"
-                name="email"
-                required
                 autoComplete="email"
-                value={values.email}
-                onChange={handleChange}
-                className={inputClassName}
+                className={`${registerInputClassName} ${errors.email ? registerInputErrorClassName : ""}`}
                 placeholder="you@example.com"
+                {...register("email")}
               />
+              {errors.email ? (
+                <p className="mt-2 text-xs text-rose-300">
+                  {errors.email.message}
+                </p>
+              ) : null}
             </label>
 
             <label className="block">
@@ -75,14 +71,16 @@ export default function RegisterPage() {
               </span>
               <input
                 type="text"
-                name="username"
-                required
                 autoComplete="username"
-                value={values.username}
-                onChange={handleChange}
-                className={inputClassName}
+                className={`${registerInputClassName} ${errors.username ? registerInputErrorClassName : ""}`}
                 placeholder="your_username"
+                {...register("username")}
               />
+              {errors.username ? (
+                <p className="mt-2 text-xs text-rose-300">
+                  {errors.username.message}
+                </p>
+              ) : null}
             </label>
 
             <label className="block">
@@ -91,14 +89,16 @@ export default function RegisterPage() {
               </span>
               <input
                 type="text"
-                name="given_name"
-                required
                 autoComplete="given-name"
-                value={values.given_name}
-                onChange={handleChange}
-                className={inputClassName}
+                className={`${registerInputClassName} ${errors.given_name ? registerInputErrorClassName : ""}`}
                 placeholder="First name"
+                {...register("given_name")}
               />
+              {errors.given_name ? (
+                <p className="mt-2 text-xs text-rose-300">
+                  {errors.given_name.message}
+                </p>
+              ) : null}
             </label>
 
             <label className="block">
@@ -107,14 +107,16 @@ export default function RegisterPage() {
               </span>
               <input
                 type="text"
-                name="family_name"
-                required
                 autoComplete="family-name"
-                value={values.family_name}
-                onChange={handleChange}
-                className={inputClassName}
+                className={`${registerInputClassName} ${errors.family_name ? registerInputErrorClassName : ""}`}
                 placeholder="Last name"
+                {...register("family_name")}
               />
+              {errors.family_name ? (
+                <p className="mt-2 text-xs text-rose-300">
+                  {errors.family_name.message}
+                </p>
+              ) : null}
             </label>
 
             <label className="block">
@@ -123,12 +125,14 @@ export default function RegisterPage() {
               </span>
               <input
                 type="date"
-                name="birthdate"
-                required
-                value={values.birthdate}
-                onChange={handleChange}
-                className={inputClassName}
+                className={`${registerInputClassName} ${errors.birthdate ? registerInputErrorClassName : ""}`}
+                {...register("birthdate")}
               />
+              {errors.birthdate ? (
+                <p className="mt-2 text-xs text-rose-300">
+                  {errors.birthdate.message}
+                </p>
+              ) : null}
             </label>
 
             <label className="block">
@@ -137,14 +141,16 @@ export default function RegisterPage() {
               </span>
               <input
                 type="text"
-                name="address"
-                required
                 autoComplete="street-address"
-                value={values.address}
-                onChange={handleChange}
-                className={inputClassName}
+                className={`${registerInputClassName} ${errors.address ? registerInputErrorClassName : ""}`}
                 placeholder="Your address"
+                {...register("address")}
               />
+              {errors.address ? (
+                <p className="mt-2 text-xs text-rose-300">
+                  {errors.address.message}
+                </p>
+              ) : null}
             </label>
 
             <label className="block sm:col-span-2">
@@ -153,20 +159,21 @@ export default function RegisterPage() {
               </span>
               <input
                 type="password"
-                name="password"
-                required
-                minLength={8}
-                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$"
                 autoComplete="new-password"
-                value={values.password}
-                onChange={handleChange}
-                className={inputClassName}
+                className={`${registerInputClassName} ${errors.password ? registerInputErrorClassName : ""}`}
                 placeholder="Strong password"
+                {...register("password")}
               />
-              <p className="mt-2 text-xs text-slate-400">
-                Minimum 8 characters, including uppercase, lowercase, number,
-                and symbol.
-              </p>
+              {errors.password ? (
+                <p className="mt-2 text-xs text-rose-300">
+                  {errors.password.message}
+                </p>
+              ) : (
+                <p className="mt-2 text-xs text-slate-400">
+                  Minimum 8 characters, including uppercase, lowercase, number,
+                  and symbol.
+                </p>
+              )}
             </label>
 
             <button
