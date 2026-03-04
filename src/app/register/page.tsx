@@ -9,9 +9,12 @@ import {
   registerSchema,
 } from "@/constants/registerConstants";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
 export default function RegisterPage() {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -24,6 +27,7 @@ export default function RegisterPage() {
 
   const onSubmit = async (formValues: RegisterFormValues) => {
     console.log(formValues);
+    router.push("/verify-email");
   };
 
   return (
