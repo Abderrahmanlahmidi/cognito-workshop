@@ -1,22 +1,26 @@
 "use client";
 
-import { useForm } from "@/hooks/useForm";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  loginDefaultValues,
+  loginInputClassName,
+  loginInputErrorClassName,
+  LoginFormValues,
+  loginSchema,
+} from "@/constants/loginConstants";
 import Link from "next/link";
-
-const inputClassName =
-  "mt-2 w-full rounded-xl border border-slate-700/70 bg-slate-900/70 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-400 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20";
-
-type LoginFormValues = {
-  identifier: string;
-  password: string;
-};
+import { useForm } from "react-hook-form";
 
 export default function LoginPage() {
-  const { values, handleChange, handleSubmit, isSubmitting } =
-    useForm<LoginFormValues>({
-      identifier: "",
-      password: "",
-    });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    mode: "onTouched",
+    defaultValues: loginDefaultValues,
+  });
 
   const onSubmit = async (formValues: LoginFormValues) => {
     console.log(formValues);
@@ -42,22 +46,25 @@ export default function LoginPage() {
 
           <form
             onSubmit={handleSubmit(onSubmit)}
+            noValidate
             className="mx-auto w-full max-w-sm space-y-5"
           >
             <label className="block">
               <span className="text-sm font-medium text-slate-200">
-               Email
+                Identifier (Email or Username)
               </span>
               <input
                 type="text"
-                name="identifier"
-                required
                 autoComplete="username"
-                value={values.identifier}
-                onChange={handleChange}
-                className={inputClassName}
+                className={`${loginInputClassName} ${errors.identifier ? loginInputErrorClassName : ""}`}
                 placeholder="you@example.com or username"
+                {...register("identifier")}
               />
+              {errors.identifier ? (
+                <p className="mt-2 text-xs text-rose-300">
+                  {errors.identifier.message}
+                </p>
+              ) : null}
             </label>
 
             <label className="block">
@@ -66,14 +73,16 @@ export default function LoginPage() {
               </span>
               <input
                 type="password"
-                name="password"
-                required
                 autoComplete="current-password"
-                value={values.password}
-                onChange={handleChange}
-                className={inputClassName}
+                className={`${loginInputClassName} ${errors.password ? loginInputErrorClassName : ""}`}
                 placeholder="Your password"
+                {...register("password")}
               />
+              {errors.password ? (
+                <p className="mt-2 text-xs text-rose-300">
+                  {errors.password.message}
+                </p>
+              ) : null}
             </label>
 
             <button
